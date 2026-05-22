@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Halaman Login Siswa</title>
+    <style>
+        /* Modern Vibrant Setup */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', 'Segoe UI', system-ui, sans-serif; }
+        body { 
+            display: flex; justify-content: center; align-items: center; min-height: 100vh; 
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7f00ff 100%);
+            overflow-x: hidden;
+        }
+        
+        /* Interactive Glowing Card */
+        .login-card { 
+            background: rgba(255, 255, 255, 0.95); padding: 40px 35px; border-radius: 20px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2), 0 0 50px rgba(127, 0, 255, 0.2); 
+            width: 100%; max-width: 420px; transform: translateY(0); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .login-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.3), 0 0 60px rgba(127, 0, 255, 0.3); }
+        
+        /* Gaya Logo Sekolah PNG */
+        .logo-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .school-logo {
+            width: 100px;
+            height: auto;
+            object-fit: contain;
+            filter: drop-shadow(0px 4px 8px rgba(30, 60, 114, 0.15)); 
+        }
+
+        h2 { text-align: center; margin-bottom: 25px; color: #1e3c72; font-weight: 700; font-size: 24px; letter-spacing: -0.5px; }
+        .form-group { margin-bottom: 22px; position: relative; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #4a5568; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        /* Modern Inputs with Active Borders */
+        input { 
+            width: 100%; padding: 14px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; 
+            color: #2d3748; background: #f7fafc; transition: all 0.3s ease; 
+        }
+        input:focus { outline: none; border-color: #7f00ff; background: white; box-shadow: 0 0 0 4px rgba(127, 0, 255, 0.15); }
+        
+        /* Animated Button */
+        button { 
+            width: 100%; padding: 14px; background: linear-gradient(135deg, #7f00ff 0%, #1e3c72 100%); border: none; 
+            color: white; border-radius: 10px; font-size: 16px; cursor: pointer; font-weight: 600; margin-top: 15px; 
+            box-shadow: 0 5px 15px rgba(127, 0, 255, 0.3); transition: all 0.3s ease; letter-spacing: 0.5px;
+        }
+        button:hover { background: linear-gradient(135deg, #1e3c72 0%, #7f00ff 100%); box-shadow: 0 8px 20px rgba(127, 0, 255, 0.4); transform: scale(1.01); }
+        button:active { transform: scale(0.99); }
+        
+        /* Styled Links */
+        .links { display: flex; justify-content: space-between; margin-top: 25px; font-size: 14px; }
+        .links a { color: #1e3c72; text-decoration: none; cursor: pointer; font-weight: 600; transition: color 0.2s ease; }
+        .links a:hover { color: #7f00ff; text-decoration: underline; }
+        
+        /* Glassmorphism Modals */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(8px); justify-content: center; align-items: center; z-index: 1000; animation: fadeIn 0.3s ease; }
+        .modal-content { background: white; padding: 35px; border-radius: 18px; max-width: 420px; width: 90%; position: relative; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04); transform: scale(0.9); animation: scaleUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; font-weight: bold; color: #a0aec0; transition: color 0.2s; }
+        .close-btn:hover { color: #2d3748; }
+        .modal h3 { color: #1e3c72; margin-bottom: 15px; font-size: 22px; font-weight: 700; }
+        .modal p { color: #718096; font-size: 14px; line-height: 1.6; margin-bottom: 25px; }
+        .modal button { background: #4a5568; box-shadow: none; width: auto; padding: 10px 25px; margin-top: 0; }
+        .modal button:hover { background: #2d3748; box-shadow: none; }
+
+        /* Khusus Desain Modal Peringatan Salah */
+        #errorModal h3 { color: #e53e3e; }
+        #errorModal button { background: #e53e3e; }
+        #errorModal button:hover { background: #c53030; }
+
+        /* Keyframe Animations */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes scaleUp { from { transform: scale(0.8); } to { transform: scale(1); } }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <!-- Elemen Logo Sekolah -->
+        <div class="logo-container">
+            <img src="img/logo-sekolah.png" alt="Logo Sekolah" class="school-logo">
+        </div>
+        
+        <h2>Sistem Kelulusan</h2>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="nisn">NISN Siswa</label>
+                <input type="text" id="nisn" placeholder="Masukkan NISN Anak" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Masukkan Password Dengan Tanggal Lahir" required>
+            </div>
+            <button type="submit">Login</button>
+        </form>
+        <div class="links">
+            <a onclick="openModal('forgotModal')">Lupa Password?</a>
+            <a onclick="openModal('registerModal')">Daftar Akun</a>
+        </div>
+    </div>
+
+    <!-- POP UP BARU: Modal Box Peringatan Salah Login -->
+    <div id="errorModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('errorModal')">&times;</span>
+            <h3>Peringatan</h3>
+            <p>NISN/password yang anda masukkan salah</p>
+            <button onclick="closeModal('errorModal')">Coba Lagi</button>
+        </div>
+    </div>
+
+    <!-- Modal Lupa Password -->
+    <div id="forgotModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('forgotModal')">&times;</span>
+            <h3>Lupa Sandi?</h3>
+            <p>Sistem reset mandiri dinonaktifkan demi keamanan. Silakan langsung temui petugas Tata Usaha (TU) sekolah untuk memperbarui kata sandi Anda.</p>
+            <button onclick="closeModal('forgotModal')">Mengerti</button>
+        </div>
+    </div>
+
+    <!-- Modal Daftar -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('registerModal')">&times;</span>
+            <h3>Registrasi Siswa</h3>
+            <p>Akun Anda sudah dibuat otomatis oleh admin sekolah menggunakan database dapodik pusat. Silakan gunakan NISN dan password standar sekolah.</p>
+            <button onclick="closeModal('registerModal')">Tutup</button>
+        </div>
+    </div>
+
+    <script>
+        // Database Lengkap Siswa sesuai dengan Data Tabel Excel Terbaru Anda
+        const userDatabase = {
+            "0141364026": { password: "090114", nama: "ADELARD DARY ABIYYU" },
+            "3143369107": { password: "110714", nama: "AISHA RAMADHANTI ZAHRA" },
+            "3131878240": { password: "191013", nama: "AKIFAH ADWA WICAKSONO" },
+            "0136274197": { password: "301113", nama: "ALDRIDGE BASIR RIZQULLAH" },
+            "0148246343": { password: "120614", nama: "ALICIA MUGHNY SHALIHA" },
+            "0135025175": { password: "180413", nama: "AMIERA YUMNA FARIHA" },
+            "3144355501": { password: "300314", nama: "AREEQAH ATHIYYA EARLY" },
+            "0138477255": { password: "210513", nama: "DAKOTA SYATHIR OMAR" },
+            "0137113290": { password: "080613", nama: "DANES AUFA DEWANGGA" },
+            "3130076732": { password: "120813", nama: "FARIHA QOLBIYA ROHMAN" },
+            "3130167903": { password: "140713", nama: "GIBRAN ATHAYA" },
+            "3133483153": { password: "011213", nama: "GIBRAN ZAVERIO SANTOSO" },
+            "3131764957": { password: "061213", nama: "HAFIZA KHAIRA LUBNA" },
+            "3139872599": { password: "280813", nama: "HAFIZHAH KHAIRA LUBNA" },
+            "3132242836": { password: "251013", nama: "LATHFA LATIFATUL QOLBI" },
+            "0115050905": { password: "100811", nama: "MUHAMAD HAIKAL RAMADHAN" },
+            "3132383558": { password: "220413", nama: "MUHAMMAD DAMAR ABYASA PUTRA WASESA" },
+            "3139748833": { password: "260813", nama: "MUHAMMAD SULTHON NUNO" },
+            "3143290646": { password: "070313", nama: "NAUFAL ADI FIRMANSYAH" },
+            "0136594078": { password: "170113", nama: "QHAISARA KINANTI JANAVARI" },
+            "3136273041": { password: "140413", nama: "RAAFI ARYA BIMA" },
+            "0132052142": { password: "230513", nama: "RAFID SERGINHO ZAIDAN PURNOMO" },
+            "3141137199": { password: "170814", nama: "RAYNITHA ZALKA PERTIWI" },
+            "0138326099": { password: "030313", nama: "RAZZA ARAFA EL GHAISANI NYLMAN" },
+            "3134690944": { password: "141113", nama: "SELENA ALMA IRVANSYAH" },
+            "0134935873": { password: "041013", nama: "SHAKEEL ZIO ATHILASYAH" },
+            "3144751765": { password: "040714", nama: "SHAYNA NINDYA SYAHRIANO" },
+            "3140901224": { password: "020114", nama: "SYARIFAH RUGAYYAH SYAKIRAH" },
+            "3148409247": { password: "150514", nama: "THALIA DWI PUTRI KHUMAIROH" },
+            "3139584006": { password: "160913", nama: "TIARA AYU SINGGIH" },
+            "0146014624": { password: "210414", nama: "VALENTINO XAVIER" }
+        };
+
+        // Validasi form login
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const nisnInput = document.getElementById('nisn').value.trim();
+            const passwordInput = document.getElementById('password').value.trim();
+
+            if (userDatabase[nisnInput] && userDatabase[nisnInput].password === passwordInput) {
+                localStorage.setItem('loggedInNISN', nisnInput);
+                localStorage.setItem('loggedInNama', userDatabase[nisnInput].nama);
+                window.location.href = './dashboard.html';
+            } else {
+                // Membuka modal box peringatan kustom buatan kita (Bukan alert bawaan browser lagi)
+                openModal('errorModal');
+            }
+        });
+
+        // Kontrol Modal Box
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) { event.target.style.display = 'none'; }
+        }
+    </script>
+</body>
+</html>

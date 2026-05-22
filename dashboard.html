@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Kelulusan Siswa</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', 'Segoe UI', sans-serif; }
+        body { background-color: #f0f4f8; color: #1a202c; min-height: 100vh; position: relative; overflow-x: hidden; }
+        
+        /* Canvas Transparan Utama untuk Efek Heboh */
+        #celebrationCanvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 999;
+        }
+
+        /* Navbar Style */
+        .navbar { 
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); 
+            padding: 15px 5%; color: white; display: flex; justify-content: space-between; align-items: center; 
+            box-shadow: 0 4px 15px rgba(30, 60, 114, 0.25); position: relative; z-index: 10; gap: 20px;
+        }
+
+        /* Container khusus untuk Running Text */
+        .running-text-container {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+        }
+        
+        /* Gaya Teks Berjalan */
+        .navbar marquee {
+            font-size: 18px; 
+            font-weight: 700; 
+            letter-spacing: 0.5px;
+            color: #ffffff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .logout-btn { background: #e53e3e; padding: 10px 20px; border-radius: 8px; color: white; text-decoration: none; font-weight: 600; font-size: 14px; transition: all 0.2s ease; box-shadow: 0 4px 6px rgba(229, 62, 62, 0.2); white-space: nowrap; }
+        .logout-btn:hover { background: #c53030; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(229, 62, 62, 0.3); }
+        
+        /* Main Layout Container */
+        .container { max-width: 900px; margin: 40px auto; padding: 40px; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.04); border: 1px solid rgba(226, 232, 240, 0.8); position: relative; z-index: 10; }
+        
+        /* Pengaturan Logo Sekolah di Bagian Atas Tengah Dashboard */
+        .dashboard-logo-container {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+        .dashboard-school-logo {
+            width: 120px;
+            height: auto;
+            object-fit: contain;
+            filter: drop-shadow(0px 4px 10px rgba(30, 60, 114, 0.2));
+        }
+
+        /* SKL Preview Container */
+        .preview-section { text-align: center; margin-bottom: 35px; }
+        .preview-container { background: #f7fafc; padding: 20px; border-radius: 16px; border: 1px dashed #cbd5e0; display: inline-block; max-width: 100%; }
+        .preview-img { max-width: 100%; height: auto; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); max-height: 650px; }
+        
+        /* Download Button Section */
+        .menu-section { 
+            text-align: center; 
+            border-top: 2px dashed #cbd5e0; 
+            padding-top: 35px; 
+            display: flex; 
+            justify-content: center; 
+            gap: 20px; 
+            flex-wrap: wrap;
+        }
+        
+        /* Style Tombol PDF & Gambar */
+        .download-btn { 
+            display: inline-flex; align-items: center; background: linear-gradient(135deg, #38a169 0%, #2f855a 100%); 
+            color: white; padding: 16px 30px; font-size: 15px; font-weight: 700; text-decoration: none; 
+            border-radius: 12px; border: none; cursor: pointer; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.1); 
+            box-shadow: 0 8px 20px rgba(47, 133, 90, 0.3); letter-spacing: 0.5px;
+        }
+        .download-btn:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 12px 25px rgba(47, 133, 90, 0.4); }
+        
+        /* Tombol Khusus Download Gambar */
+        .image-btn {
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            box-shadow: 0 8px 20px rgba(3, 105, 161, 0.3);
+        }
+        .image-btn:hover { box-shadow: 0 12px 25px rgba(3, 105, 161, 0.4); }
+    </style>
+</head>
+<body>
+
+    <!-- Canvas Tunggal untuk Kembang Api Akbar & Party Popper -->
+    <canvas id="celebrationCanvas"></canvas>
+
+    <div class="navbar">
+        <div class="running-text-container">
+            <marquee scrollamount="6" behavior="scroll" direction="left">
+                SISTEM KELULUSAN SISWA SDI AN NAJAH CIPAYUNG - JAKARTA TIMUR
+            </marquee>
+        </div>
+        <a href="#" class="logout-btn" onclick="logout()">Keluar Akun</a>
+    </div>
+
+    <div class="container">
+        <!-- Logo Sekolah Besar di Tengah Atas -->
+        <div class="dashboard-logo-container">
+            <img src="img/logo-sekolah.png" alt="Logo Sekolah" class="dashboard-school-logo">
+        </div>
+
+        <!-- Bagian Gambar SKL Siswa -->
+        <div class="preview-section">
+            <div class="preview-container">
+                <img id="sklPreview" src="" alt="Pratinjau SKL Anda gagal dimuat." class="preview-img">
+            </div>
+        </div>
+
+        <!-- Bagian Tombol Unduh PDF dan Gambar -->
+        <div class="menu-section">
+            <!-- Atribut 'download' diisi nama file agar otomatis terunduh instan -->
+            <a id="imageLink" href="#" download="SKL_Siswa.png" class="download-btn image-btn">
+                📥 UNDUH GAMBAR SKL (PNG)
+            </a>
+            <a id="pdfLink" href="#" download="SKL_Siswa.pdf" class="download-btn">
+                📄 UNDUH SURAT KETERANGAN LULUS (PDF)
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Sesi Otentikasi Pengguna
+        const currentNISN = localStorage.getItem('loggedInNISN');
+        const currentNama = localStorage.getItem('loggedInNama');
+
+        if (!currentNISN) {
+            alert("Sesi berakhir, silakan login kembali.");
+            window.location.href = 'login.html';
+        } else {
+            const pdfPath = `pdf/SKL_${currentNISN}.pdf`; 
+            const imgPath = `img/SKL_${currentNISN}.png`; 
+
+            // Pasang jalur berkas
+            document.getElementById('pdfLink').setAttribute('href', pdfPath);
+            document.getElementById('imageLink').setAttribute('href', imgPath);
+            document.getElementById('sklPreview').setAttribute('src', imgPath);
+
+            // OPTIMASI: Set nama file unduhan otomatis berdasarkan nama anak agar langsung ter-download instan
+            document.getElementById('imageLink').setAttribute('download', `SKL_${currentNama}.png`);
+            document.getElementById('pdfLink').setAttribute('download', `SKL_${currentNama}.pdf`);
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'login.html';
+        }
+
+        // ==================================================
+        // ENGINE ANIMASI MERIAH: HEAVY FIREWORKS & PARTY POPPER
+        // ==================================================
+        const canvas = document.getElementById('celebrationCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        let items = [];
+        const vibrantColors = ['#FF1493', '#00FFFF', '#FFD700', '#FF00FF', '#00FF00', '#FF4500', '#9400D3', '#FFFFFF', '#39FF14'];
+
+        class CelebrationItem {
+            constructor(x, y, type, color, angle, speed) {
+                this.x = x;
+                this.y = y;
+                this.type = type;
+                this.color = color;
+                this.alpha = 1;
+                this.decay = Math.random() * 0.012 + 0.008;
+
+                if (type === 'firework') {
+                    this.radius = Math.random() * 4 + 1.5;
+                    this.velocity = {
+                        x: (Math.random() - 0.5) * 14,
+                        y: (Math.random() - 0.5) * 14
+                    };
+                    this.gravity = 0.06;
+                } else {
+                    this.width = Math.random() * 8 + 4;
+                    this.height = Math.random() * 12 + 6;
+                    this.rotation = Math.random() * Math.PI;
+                    this.rotationSpeed = (Math.random() - 0.5) * 0.2;
+                    this.velocity = {
+                        x: Math.cos(angle) * speed * (Math.random() * 0.6 + 0.7),
+                        y: Math.sin(angle) * speed * (Math.random() * 0.6 + 0.7)
+                    };
+                    this.gravity = 0.15;
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.beginPath();
+                
+                if (this.type === 'firework') {
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+                    ctx.fillStyle = this.color;
+                    ctx.shadowBlur = 12;
+                    ctx.shadowColor = this.color;
+                    ctx.fill();
+                } else {
+                    ctx.translate(this.x, this.y);
+                    ctx.rotate(this.rotation);
+                    ctx.fillStyle = this.color;
+                    ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
+                }
+                ctx.restore();
+            }
+
+            update() {
+                this.velocity.y += this.gravity;
+                this.x += this.velocity.x;
+                this.y += this.velocity.y;
+                if (this.type === 'popper') {
+                    this.rotation += this.rotationSpeed;
+                    this.velocity.x *= 0.98;
+                }
+                this.alpha -= this.decay;
+            }
+        }
+
+        function triggerMegaFirework(x, y) {
+            const randomColor = vibrantColors[Math.floor(Math.random() * vibrantColors.length)];
+            for (let i = 0; i < 75; i++) {
+                items.push(new CelebrationItem(x, y, 'firework', randomColor));
+            }
+        }
+
+        function shootPartyPopper(side) {
+            const x = side === 'left' ? 0 : canvas.width;
+            const y = canvas.height * 0.9;
+            const baseAngle = side === 'left' ? -Math.PI / 4 : -3 * Math.PI / 4;
+            
+            for (let i = 0; i < 60; i++) {
+                const angle = baseAngle + (Math.random() - 0.5) * 0.4;
+                const speed = Math.random() * 15 + 15;
+                const randomColor = vibrantColors[Math.floor(Math.random() * vibrantColors.length)];
+                items.push(new CelebrationItem(x, y, 'popper', randomColor, angle, speed));
+            }
+        }
+
+        function renderLoop() {
+            requestAnimationFrame(renderLoop);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            items.forEach((item, index) => {
+                if (item.alpha <= 0) {
+                    items.splice(index, 1);
+                } else {
+                    item.update();
+                    item.draw();
+                }
+            });
+        }
+
+        setTimeout(() => {
+            shootPartyPopper('left');
+            shootPartyPopper('right');
+        }, 300);
+
+        setTimeout(() => {
+            shootPartyPopper('left');
+            shootPartyPopper('right');
+            triggerMegaFirework(canvas.width / 2, canvas.height * 0.3);
+        }, 900);
+
+        setInterval(() => {
+            if (items.length < 400) {
+                const randomX = Math.random() * (canvas.width * 0.6) + (canvas.width * 0.2);
+                const randomY = Math.random() * (canvas.height * 0.4) + (canvas.height * 0.1);
+                triggerMegaFirework(randomX, randomY);
+            }
+        }, 600);
+
+        setInterval(() => {
+            shootPartyPopper(Math.random() > 0.5 ? 'left' : 'right');
+        }, 2500);
+
+        renderLoop();
+    </script>
+</body>
+</html>
